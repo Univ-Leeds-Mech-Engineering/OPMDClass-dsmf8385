@@ -6,6 +6,8 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
 from submission.model import DentalClassifier
 
+print(data.class_to_idx)
+
 def fit(model, train_loader, val_loader, epochs = 10):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr = 0.001)
