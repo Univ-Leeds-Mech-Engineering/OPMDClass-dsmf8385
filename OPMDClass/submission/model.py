@@ -26,18 +26,30 @@ class DentalClassifier(nn.Module):
     def __init__(self):
         super(DentalClassifier, self).__init__()
 
-        # ----------------------------------------------------------------
-        # TODO: Define your architecture below
-        # You may use CNNs, transfer learning, ViTs, etc.
-        #
-        # Example (simple CNN — replace with your design):
-        # self.features = nn.Sequential(
-        #     nn.Conv2d(3, 32, kernel_size=3, padding=1),
-        #     nn.ReLU(),
-        #     nn.MaxPool2d(2),
-        # )
-        # self.classifier = nn.Linear(32 * 112 * 112, 2)
-        # ----------------------------------------------------------------
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 16, kernel_size = 3, padding = 1),
+            nn.ReLU(), 
+            nn.MacPool2d(2),
+
+            nn.Conv2d(16, 32, kernel_size = 3, padding = 1),
+            nn.ReLU(), 
+            nn.MacPool2d(2),
+
+            nn.Conv2d(32, 64, kernel_size = 3, padding = 1),
+            nn.ReLU(), 
+            nn.MacPool2d(2),
+
+            nn.AdaptiveAvgPool2d((1,1))
+        )
+
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(64, 128),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(128, 2)
+        )
+
         pass
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -50,7 +62,8 @@ class DentalClassifier(nn.Module):
         Returns:
             Logits tensor of shape (batch_size, 2)
         """
-        # ----------------------------------------------------------------
-        # TODO: Implement your forward pass
-        # ----------------------------------------------------------------
-        raise NotImplementedError("Implement forward() in model.py")
+        z = self.encoder(x)
+        out = self.classifier(z)
+
+        return out 
+
