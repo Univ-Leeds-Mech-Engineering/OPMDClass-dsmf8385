@@ -36,6 +36,7 @@ transform = transforms.Compose([
     transforms.transforms.Normalize(
             [0.485, 0.456, 0.406],
             [0.229, 0.224, 0.225]
+        )
 ])
 
 data = ImageFolder("data/sample_test", transform = transform)
@@ -43,5 +44,5 @@ loader = torch.utils.data.DataLoader(data, batch_size = 16, shuffle = True)
 
 model = DentalClassifier()
 
-fit(model, loader, epochs = 10)
+fit(model, loader, epochs = 15)
 
