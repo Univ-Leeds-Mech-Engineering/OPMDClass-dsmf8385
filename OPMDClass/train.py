@@ -8,11 +8,8 @@ from submission.model import DentalClassifier
 
 
 def fit(model, train_loader, val_loader, epochs = 10):
-    weights = torch.tensor([1.0, 1.2])
-    weights[0] = 1.2
-    weights[1] = 1.0
-    criterion = nn.CrossEntropyLoss(weight = weights)
-    optimizer = optim.Adam(model.parameters(), lr = 1e-4)
+    criterion = nn.CrossEntropyLoss()
+    optimizer = optim.Adam(model.model.fc.parameters(), lr = 1e-4)
 
     least_val_loss = float("inf")
 
