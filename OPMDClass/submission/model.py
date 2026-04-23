@@ -28,7 +28,7 @@ class DentalClassifier(nn.Module):
 
         self.model = resnet18(pretrained = True)
 
-    for parameter in model.model.parameters():
+    for parameter in self.model.parameters():
         parameter.requires_grad = False
         self.model.fc = nn.Linear(self.model.fc.in_features, 2)
 
