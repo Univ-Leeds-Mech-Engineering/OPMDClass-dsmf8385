@@ -12,7 +12,10 @@ Rules:
 """
 
 import torch
+from torchvision import transforms 
 from PIL import Image
+from submission.model import DentalClassifier
+
 
 
 # ── Class Mapping (DO NOT CHANGE) ────────────────────────────────
@@ -41,10 +44,11 @@ def load_model(model_path: str):
         model.eval()
         return model
     """
-    # ----------------------------------------------------------------
-    # TODO: Load your model here
-    # ----------------------------------------------------------------
-    raise NotImplementedError("Implement load_model() in predict.py")
+    model = DentalClassifier()
+    model.load_state_dict(torch.load(model_path, map_location = "cpu"))
+    model.eval()
+
+    return model
 
 
 def predict(model, image_path: str) -> int:
@@ -72,7 +76,22 @@ def predict(model, image_path: str) -> int:
             pred = torch.argmax(logits, dim=1).item()
         return int(pred)
     """
-    # ----------------------------------------------------------------
-    # TODO: Implement your prediction pipeline here
-    # ----------------------------------------------------------------
-    raise NotImplementedError("Implement predict() in predict.py")
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            [0.485, 0.456, 0.406],
+            [0.229, 0.224, 0.225]
+        )
+    ])
+
+    image = Image.open(image_path).convert("RGB")
+    tensor = transform(image).unsqueeze(0)
+    with torch.no_grad():
+        logits = model(tensor)
+        pred = torch.argmax(logits, dim = 1).item()
+
+    return int(pred)
+
+
+
