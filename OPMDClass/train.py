@@ -6,7 +6,6 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, random_split
 from submission.model import DentalClassifier
 
-print(data.class_to_idx)
 
 def fit(model, train_loader, val_loader, epochs = 10):
     criterion = nn.CrossEntropyLoss()
@@ -59,6 +58,9 @@ transform = transforms.Compose([
 ])
 
 data = ImageFolder("data/sample_test", transform = transform)
+
+print(data.class_to_idx)
+
 train_size = int(0.8 * len(data))
 val_size = len(data) - train_size       
 train_data, val_data = random_split(data, [train_size, val_size])
