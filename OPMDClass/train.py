@@ -2,11 +2,11 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torchvision.transforms import transforms
-from torch.utils.data import DataLoader, Dataset
+from torchvision.datasets import datasets
 from submission.model import DentalClassifier
 
 def fit(model, loader, epochs):
-    crtierion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr = 1e-4)
 
     least_loss = float("inf")
@@ -16,7 +16,7 @@ def fit(model, loader, epochs):
         for images, labels in loader:
             optimizer.zero_grad()
             outputs = model(images)
-            loss = crtierion(outputs, labels)
+            loss = criterion(outputs, labels)
             loss.backward()
             optimizer.step()
 
