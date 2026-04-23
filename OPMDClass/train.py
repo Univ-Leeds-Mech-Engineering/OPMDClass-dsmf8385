@@ -10,9 +10,12 @@ def fit(model, train_loader, val_loader, epochs = 10):
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr = 0.001)
 
+    least_val_loss = float("inf")
+
     for epoch in range(epochs):
         model.train()
-        running_loss = 0.0
+        train_loss = 0.0
+
         for images, labels in train_loader:
             optimizer.zero_grad()
 
@@ -37,12 +40,12 @@ def fit(model, train_loader, val_loader, epochs = 10):
         
         val_loss /= len(val_loader.dataset) 
 
-        print(f"Epoch [{epoch+1}/{epochs}], Loss: {avg_loss:.4f}")
+        print(f"Epoch [{epoch+1}/{epochs}], Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}")
 
-        if val_loss < best_val_loss:
-            best_val_loss = val_loss
+        if val_loss < least_val_loss:
+            least_val_loss = val_loss
             torch.save(model.state_dict(), "submission/best_model.pth")
-            print(f"  ✅ New best model saved with val loss: {best_val_loss:.4f}")
+            print(f"  ✅ New best model saved with val loss: {least_val_loss:.4f}")
 
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
