@@ -1,7 +1,6 @@
 import torch 
 import torch.nn as nn
 import torch.optim as optim
-from torchvision.datasets import datasets
 from torchvision.datasets import ImageFolder
 from torchvision import transforms
 from submission.model import DentalClassifier
@@ -35,7 +34,7 @@ transform = transforms.Compose([
     transforms.ToTensor(),
 ])
 
-data = datasets.ImageFolder("data/sample_test", transform = transform)
+data = ImageFolder("data/sample_test", transform = transform)
 loader = torch.utils.data.DataLoader(data, batch_size = 16, shuffle = True)
 
 model = DentalClassifier()
