@@ -22,7 +22,8 @@ def fit(model, loader, epochs):
 
             total_loss += loss.item() * images.size(0)
         
-        print(f"Epoch {epoch+1}/{epochs}, Loss: {total_loss/len(loader.dataset):.4f}")
+        average_loss = total_loss / len(loader.dataset)
+        print(f"Epoch {epoch+1}/{epochs}, Loss: {average_loss:.4f}")
 
         if total_loss < least_loss: 
             least_loss = total_loss
@@ -32,6 +33,9 @@ def fit(model, loader, epochs):
 transform = transforms.Compose([
     transforms.Resize((224, 224)),
     transforms.ToTensor(),
+    transforms.transforms.Normalize(
+            [0.485, 0.456, 0.406],
+            [0.229, 0.224, 0.225]
 ])
 
 data = ImageFolder("data/sample_test", transform = transform)
