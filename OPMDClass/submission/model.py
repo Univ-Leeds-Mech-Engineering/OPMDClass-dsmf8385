@@ -29,15 +29,15 @@ class DentalClassifier(nn.Module):
         self.encoder = nn.Sequential(
             nn.Conv2d(3, 16, kernel_size = 3, padding = 1),
             nn.ReLU(), 
-            nn.MacPool2d(2),
+            nn.MaxPool2d(2),
 
             nn.Conv2d(16, 32, kernel_size = 3, padding = 1),
             nn.ReLU(), 
-            nn.MacPool2d(2),
+            nn.MaxPool2d(2),
 
             nn.Conv2d(32, 64, kernel_size = 3, padding = 1),
             nn.ReLU(), 
-            nn.MacPool2d(2),
+            nn.MaxPool2d(2),
 
             nn.AdaptiveAvgPool2d((1,1))
         )
@@ -50,7 +50,6 @@ class DentalClassifier(nn.Module):
             nn.Linear(128, 2)
         )
 
-        pass
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -66,4 +65,3 @@ class DentalClassifier(nn.Module):
         out = self.classifier(z)
 
         return out 
-
