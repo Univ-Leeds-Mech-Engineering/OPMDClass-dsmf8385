@@ -26,30 +26,8 @@ class DentalClassifier(nn.Module):
     def __init__(self):
         super(DentalClassifier, self).__init__()
 
-        self.encoder = nn.Sequential(
-            nn.Conv2d(3, 16, kernel_size = 3, padding = 1),
-            nn.ReLU(), 
-            nn.MaxPool2d(2),
-
-            nn.Conv2d(16, 32, kernel_size = 3, padding = 1),
-            nn.ReLU(), 
-            nn.MaxPool2d(2),
-
-            nn.Conv2d(32, 64, kernel_size = 3, padding = 1),
-            nn.ReLU(), 
-            nn.MaxPool2d(2),
-
-            nn.AdaptiveAvgPool2d((1,1))
-        )
-
-        self.classifier = nn.Sequential(
-            nn.Flatten(),
-            nn.Linear(64, 128),
-            nn.ReLU(),
-            nn.Dropout(0.5),
-            nn.Linear(128, 2)
-        )
-
+        self.model = resnet18(pretrained = True)
+        self.model.fc = nn.Linear(self.model.fc.in_features, 2)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -61,7 +39,6 @@ class DentalClassifier(nn.Module):
         Returns:
             Logits tensor of shape (batch_size, 2)
         """
-        z = self.encoder(x)
-        out = self.classifier(z)
+        out = self.model(x)
 
         return out 
