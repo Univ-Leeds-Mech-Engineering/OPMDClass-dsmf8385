@@ -1,8 +1,8 @@
 import torch 
 import torch.nn as nn
 import torch.optim as optim
-from torchvision.datasets import datasets
-from torchvision.transforms import transforms
+from torchvision.datasets import ImageFolder
+from torchvision import transforms
 from submission.model import DentalClassifier
 
 def fit(model, loader, epochs):
