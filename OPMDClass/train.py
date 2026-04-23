@@ -53,7 +53,7 @@ transform = transforms.Compose([
     )
 ])
 
-data = ImageFolder("data/train", transform = transform)
+data = ImageFolder("data/sample_test", transform = transform)
 train_size = int(0.8 * len(data))
 val_size = len(data) - train_size       
 train_data, val_data = random_split(data, [train_size, val_size])
