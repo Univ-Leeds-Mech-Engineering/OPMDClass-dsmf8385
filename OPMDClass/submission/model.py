@@ -26,20 +26,29 @@ class DentalClassifier(nn.Module):
     def __init__(self):
         super(DentalClassifier, self).__init__()
 
-        self.model = resnet18(pretrained = True)
-        
-        for name, parameter in self.model.named_parameters():
-            if "layer3" or "layer4" in name:
-                parameter.requires_grad = True
-            else:
-                parameter.requires_grad = False
+        self.encoder = nn.Sequential(
+            nn.Conv2d(3, 16, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
 
-        self.model.fc = nn.Identity()
+            nn.Conv2d(16, 32, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+            
+            nn.Conv2d(32, 64, kernel_size=3, stride=1, padding=1),
+            nn.ReLU(),
+            nn.MaxPool2d(2),
+
+            nn.AdaptiveAvgPool2d((1, 1))
+
+        )
 
         self.classifier = nn.Sequential(
-            nn.Dropout(0.3),
-            nn.Linear(512, 2)
-        )
+            nn.Flatten(),
+            nn.Linear(64, 128),
+            nn.ReLU(),
+            nn.Linear(128, 2),
+            nn.Dropout(0.3)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
