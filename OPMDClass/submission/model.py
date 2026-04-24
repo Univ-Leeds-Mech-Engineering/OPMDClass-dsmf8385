@@ -28,13 +28,16 @@ class DentalClassifier(nn.Module):
 
         self.model = resnet18(pretrained = True)
         
-        for parameter in self.model.parameters():
-            parameter.requires_grad = False
+        for name, parameter in self.model.named_parameters():
+            if "layer4" in name:
+                parameter.requires_grad = True
+            else:
+                parameter.requires_grad = False
 
         self.model.fc = nn.Identity()
 
         self.classifier = nn.Sequential(
-            nn.Dropout(0.5),
+            nn.Dropout(0.3),
             nn.Linear(512, 2)
         )
 
