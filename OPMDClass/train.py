@@ -9,7 +9,7 @@ from submission.model import DentalClassifier
 
 def fit(model, train_loader, val_loader, epochs = 20):
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.classifier.parameters(), lr = 2e-4)
+    optimizer = optim.Adam(model.classifier.parameters(), lr = 1e-4)
 
     least_val_loss = float("inf")
 
