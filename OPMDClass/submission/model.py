@@ -29,7 +29,7 @@ class DentalClassifier(nn.Module):
         self.model = resnet18(pretrained = True)
         
         for name, parameter in self.model.named_parameters():
-            if "layer4" in name:
+            if "layer3" or "layer4" in name:
                 parameter.requires_grad = True
             else:
                 parameter.requires_grad = False
