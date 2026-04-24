@@ -30,8 +30,13 @@ class DentalClassifier(nn.Module):
         
         for parameter in self.model.parameters():
             parameter.requires_grad = False
-            
-        self.model.fc = nn.Linear(self.model.fc.in_features, 2)
+
+        self.model.fc = nn.Identity()
+
+        self.classifier = nn.Sequential(
+            nn.Dropout(0.5),
+            nn.Linear(512, 2)
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -43,6 +48,7 @@ class DentalClassifier(nn.Module):
         Returns:
             Logits tensor of shape (batch_size, 2)
         """
-        out = self.model(x)
+        z = self.model(x)
+        out = self.classifier(z)
 
         return out 
