@@ -28,11 +28,12 @@ class DentalClassifier(nn.Module):
 
         self.model = resnet18(pretrained = True)
         
-        for name, parameter in self.model.named_parameters():
-            if "layer2" in name or"layer3" in name or "layer4" in name:
-                parameter.requires_grad = True
-            else:
-                parameter.requires_grad = False
+        for parameter in self.model.parameters():
+            parameter.requires_grad = False
+        
+        for parameter in self.model.layer4.parameters():
+            parameter.requires_grad = True
+    
 
         self.model.fc = nn.Identity()
 

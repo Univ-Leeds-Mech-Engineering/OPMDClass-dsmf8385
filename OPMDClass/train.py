@@ -7,10 +7,13 @@ from torch.utils.data import DataLoader, random_split
 from submission.model import DentalClassifier
 
 
-def fit(model, train_loader, val_loader, epochs = 20):
+def fit(model, train_loader, epochs = 20):
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.classifier.parameters(), lr = 1e-4)
+    optimizer = optim.Adam(
+        filter(lambda p: p.requires_grad, model.parameters()), 
+    lr = 1e-4   
+    )
 
     least_val_loss = float("inf")
 
@@ -31,28 +34,14 @@ def fit(model, train_loader, val_loader, epochs = 20):
 
         train_loss /= len(train_loader.dataset)
 
-        model.eval()
-        val_loss = 0.0
+        print(f"Epoch [{epoch+1}/{epochs}], Loss: {train_loss:.4f}")
 
-        with torch.no_grad():
-            for images, labels in val_loader:
-                outputs = model(images)
-                loss = criterion(outputs, labels)
-                val_loss += loss.item() * images.size(0)
-        
-        val_loss /= len(val_loader.dataset) 
-
-        print(f"Epoch [{epoch+1}/{epochs}], Loss: {train_loss:.4f}, Val Loss: {val_loss:.4f}")
-
-        if val_loss < least_val_loss:
-            least_val_loss = val_loss
-            torch.save(model.state_dict(), "submission/best_model.pth")
-            print(f"  ✅ New best model saved with val loss: {least_val_loss:.4f}")
+    
+    torch.save(model.state_dict(), "submission/best_model.pth")
+    print(f"  ✅ New best model saved with loss: {train_loss:.4f}")
 
 train_transform = transforms.Compose([
     transforms.Resize((224, 224)),
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(10),
     transforms.ToTensor(),
     transforms.Normalize(
         [0.485, 0.456, 0.406], 
@@ -60,21 +49,32 @@ train_transform = transforms.Compose([
     )
 ])
 
-val_transform = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    transforms.Normalize(
-        [0.485, 0.456, 0.406], 
-        [0.229, 0.224, 0.225]
-    )
-])
 
 
 data = ImageFolder("data/sample_test", transform = train_transform)
-train_size = int(0.8 * len(data))
-val_size = len(data) - train_size       
-train_data, val_data = random_split(data, [train_size, val_size], generator = torch.Generator().manual_seed(42))
-train_loader = DataLoader(train_data, batch_size = 32, shuffle = True)
-val_loader = DataLoader(val_data, batch_size = 32, shuffle = False)
+train_loader = DataLoader(data, batch_size = 8, shuffle = True)
+
 model = DentalClassifier()
-fit(model, train_loader, val_loader, epochs = 20)   
+model.load_state_dict(torch.load("submission/best_model.pth", map_location = torch.device("cpu")))
+fit(model, train_loader, epochs = 20)   
+
+model.eval()
+
+images, labels = next(iter(train_loader))
+outputs = model(images)
+preds = torch.argmax(outputs, dim=1)
+
+print("Predictions:", preds.tolist())
+print("Labels:     ", labels.tolist())
+
+correct = 0
+total = 0
+
+with torch.no_grad():
+    for images, labels in train_loader:
+        outputs = model(images)
+        preds = torch.argmax(outputs, dim=1)
+        correct += (preds == labels).sum().item()
+        total += labels.size(0)
+
+print("Accuracy:", correct / total)
