@@ -17,7 +17,6 @@ from PIL import Image
 from submission.model import DentalClassifier
 
 
-
 # ── Class Mapping (DO NOT CHANGE) ────────────────────────────────
 CLASS_LABELS = {
     0: "non_cancerous",

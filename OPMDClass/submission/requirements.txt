@@ -16,4 +16,8 @@
 torch
 torchvision
 Pillow
-
+submission.model
+torch.nn 
+torch.optim 
+torchvision.datasets
+torch.utils.data 
