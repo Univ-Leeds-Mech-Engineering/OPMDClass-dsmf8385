@@ -8,6 +8,7 @@ from submission.model import DentalClassifier
 
 
 def fit(model, train_loader, val_loader, epochs = 20):
+
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.classifier.parameters(), lr = 1e-4)
 
@@ -60,7 +61,7 @@ transform = transforms.Compose([
 data = ImageFolder("data/sample_test", transform = transform)
 train_size = int(0.8 * len(data))
 val_size = len(data) - train_size       
-train_data, val_data = random_split(data, [train_size, val_size])
+train_data, val_data = random_split(data, [train_size, val_size], generator = torch.Generator().manual_seed(42))
 train_loader = DataLoader(train_data, batch_size = 32, shuffle = True)
 val_loader = DataLoader(val_data, batch_size = 32, shuffle = False)
 model = DentalClassifier()
