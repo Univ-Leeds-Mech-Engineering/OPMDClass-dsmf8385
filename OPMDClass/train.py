@@ -49,18 +49,28 @@ def fit(model, train_loader, val_loader, epochs = 20):
             torch.save(model.state_dict(), "submission/best_model.pth")
             print(f"  ✅ New best model saved with val loss: {least_val_loss:.4f}")
 
-transform = transforms.Compose([
+train_transform = transforms.Compose([
     transforms.Resize((224, 224)),
-    transforms.ToTensor(),
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(10),
+    transforms.ToTensor(),
     transforms.Normalize(
         [0.485, 0.456, 0.406], 
         [0.229, 0.224, 0.225]
     )
 ])
 
-data = ImageFolder("data/sample_test", transform = transform)
+val_transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(
+        [0.485, 0.456, 0.406], 
+        [0.229, 0.224, 0.225]
+    )
+])
+
+
+data = ImageFolder("data/sample_test", transform = train_transform)
 train_size = int(0.8 * len(data))
 val_size = len(data) - train_size       
 train_data, val_data = random_split(data, [train_size, val_size], generator = torch.Generator().manual_seed(42))
