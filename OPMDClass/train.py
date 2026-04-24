@@ -58,6 +58,9 @@ transform = transforms.Compose([
 ])
 
 data = ImageFolder("data/sample_test", transform = transform)
+
+print(data.class_to_idx)
+
 data.targets = [1 - t for t in data.targets]
 train_size = int(0.8 * len(data))
 val_size = len(data) - train_size       
