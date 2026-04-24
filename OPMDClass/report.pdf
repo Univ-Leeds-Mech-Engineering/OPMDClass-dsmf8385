@@ -1,0 +1,71 @@
+1. About The Task
+Oral cancer is among several cancers that can be deadly if not caught in time. Dentists have been using imaging equipment to identify abnormal tissue that may need closer examination for potential signs of oral cancer. Doctors then manually determine whether the images contain signs of cancerous tissue or not. This process can be improved to increase patient survival rates and decrease errors in judgement.
+Manual analysis can often be exhausting and prone to human error, which is why deep learning applications have been researched to automate the classification of medical imagery to assist with clinical decisions. 
+In this project, you will build a deep learning model that classifies imagery as cancerous or non-cancerous tissue. Since labelled medical data is scarce, a transfer learning approach is implemented to leverage a pretrained convolutional neural network and tune it to the classification task. 
+The fine-tuned pretrained network is then used so that it learns features specific to the data and domain. Since sample data is little, the pretrained network is used as a feature extractor and only train a few layers to help network generalise well to the data. 
+
+2. Methodology 
+2.1 ResNet-18
+The network’s architecture follows that of ResNet-18, a popular dep residual convolutional neural network. Rather than training the network from scratch, using a pretrained ResNet-18 as a feature extractor was more efficient. The original network’s final, fully connected layer was replaced with a customer binary classifier.
+
+Training dimensions include: 
+-	Pretrained ResNet-18 backbone
+-	512-dim feature vector from backbone
+-	Customer classifier head consisting of a fully connected layer (512 -> 128), ReLU activation function, dropout regularisation layer (p = 0.3) and a final layer mapping to 2 classes (128 -> 2)
+The network outputs raw logits for each class. 
+
+2.2 Transfer Learning Approach 
+The data used was relatively small, therefore training the full network would likely have caused the model to overfit. As a result, selective fine-tuning was employed: 
+-	Freezing all layers of the pretrained network
+-	Unfreezing the final residual block (layer 4)
+-	Train only the customer classifier layer from scratch
+This strategy was implemented to retain low-level vision features learned by the backbone (“edge detectors”, texture recognisers, etc.). Furthermore, higher layers were expected to generalise poorly to dental imagery, therefore it was essential for the model to learn dentally specific features. 
+In practice, the optimiser is instructed to optimise both the classifier and later unfrozen layers, which ensures only the selected layers receive a gradient update at each training step. 
+
+2.3 DATA PREPROCESSING
+The sample data consisted of two classes: cancerous and non-cancerous. 
+No data was held out for validation as per the task’s requirements, which meant all of the information was provided to the model to train. 
+The augmentation incorporated:
+-	Resizing the images to 224 x 224 pixels 
+-	Converting to tensors 
+-	Normalising with ImageNet’s mean and standard deviation statistics (Mean : [0.485, 0.456, 0.406], STD : [0.229, 0.224, 0.225])
+Heavy augmentation was avoided as it seemed to have made the training less stable, likely due to small dataset size. 
+
+2.4 TRAINING SETUP 
+Training was accomplished using the following hyperparameters: 
+-	Loss function : CrossEntropyLoss() (recommended for multi-class prediction when using logits)
+-	Optimiser : Adaptive Moment Estimation (Adam)
+-	Learning rate: 1e – 3
+-	Batch size: 8
+-	Epochs: 20 
+For each epoch, the model was trained iteratively through batches of data, where loss data was computed. The data was propagated through the layers, updating weights using the optimiser. 
+The best performing model (with lowest train_loss) was saved for future references. 
+
+3. PERFORMANCE 
+After carefully debugging the code, the accuracy obtained in the training pipeline was 98%. This means that the model effectively learned to differentiate cancerous and non-cancerous images in the sample set. 
+Original experiments ended up giving significantly low accuracy rates (approximately 2-4%) mainly because of the training net with incorrect configuration, where frozen layers were not being included in the optimiser.
+Although the current model performed quite well, overfitting is to be expected with small dataset. 
+4. DISCUSSION 
+4.1 STRENGTHS 
+- Managed to effectively leverage transfer learning to obtain good results in low-data regimes. 
+- Freezing bottom layers helped retain helpful general features.
+- Fine-tuning upper layers allowed model to train on domain specific features.
+- Successfully debugged training pipeline for consistent results.
+
+4.2 POTENTIAL IMPROVEMENTS
+There are several limitations that came across during the task: 
+- Small dataset size limits ability to generalise.
+- Only using training and test data does not allow for reliable performance estimates.
+- High training accuracy almost guarantees overfitting.
+- Small dataset may not capture enough diversity to create robust model.
+If given the change, there are several things that could help improve performance and generalisation ability:
+-	Add more training samples 
+-	Implement safe data augmentation (i.e. horizontal flip) 
+-	Fine tune more layers while gradually unfreezing them
+-	Run classifier with cross validation instead of single training run
+-	Try more complex/performant architectures (i.e. EfficientNet) 
+
+5. CONCLUSION
+The model was able to competently apply transfer learning to use a pretrained network for classifying dental images. By utilizing a pretrained ResNet-18 network, freezing layers that would learn general features and only fine-tuning higher layers that would learn domain specific features our model was able to classify images with high accuracy.
+Debugging has highlighted the need to configure training setups correctly by ensuring trainable parameters can be optimised. Furthermore, it has emphasised the challenged of working with small datasets and the need for appropriate methodological adjustments. 
+Overall, the final model provides a strong foundation for dental image classification and is expected to perform reasonable well on unseen data through the use of transferable features.
