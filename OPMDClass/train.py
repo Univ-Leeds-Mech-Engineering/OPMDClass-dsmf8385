@@ -7,9 +7,9 @@ from torch.utils.data import DataLoader, random_split
 from submission.model import DentalClassifier
 
 
-def fit(model, train_loader, val_loader, epochs = 15):
+def fit(model, train_loader, val_loader, epochs = 20):
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.classifier.parameters(), lr = 1e-4)
+    optimizer = optim.Adam(model.classifier.parameters(), lr = 2e-4)
 
     least_val_loss = float("inf")
 
@@ -65,4 +65,4 @@ train_data, val_data = random_split(data, [train_size, val_size])
 train_loader = DataLoader(train_data, batch_size = 32, shuffle = True)
 val_loader = DataLoader(val_data, batch_size = 32, shuffle = False)
 model = DentalClassifier()
-fit(model, train_loader, val_loader, epochs = 15)   
+fit(model, train_loader, val_loader, epochs = 20)   
